@@ -3,17 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicVibe | Твоя музыка</title>
+    <title>Стасян Music | Официальный плеер</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        /* Светлая тема (по умолчанию) */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --player-bg: rgba(255, 255, 255, 0.95);
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --track-bg: #ffffff;
+            --track-border: #dfe6e9;
+            --accent: #6c5ce7;
+            --accent-hover: #a29bfe;
+            --shadow: 0 30px 50px rgba(0, 0, 0, 0.1);
+            --playlist-bg: #f8f9fa;
+            --active-glow: rgba(108, 92, 231, 0.2);
+        }
+
+        /* Темная тема */
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            --player-bg: rgba(20, 20, 20, 0.98);
+            --text-primary: #ffffff;
+            --text-secondary: #b2bec3;
+            --track-bg: #2d3436;
+            --track-border: #636e72;
+            --accent: #a29bfe;
+            --accent-hover: #6c5ce7;
+            --shadow: 0 30px 50px rgba(255, 255, 255, 0.1);
+            --playlist-bg: #1e1e1e;
+            --active-glow: rgba(162, 155, 254, 0.3);
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,68 +53,158 @@
         }
 
         .player {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--player-bg);
             backdrop-filter: blur(10px);
-            border-radius: 40px;
+            border-radius: 50px;
             padding: 40px;
-            box-shadow: 0 50px 70px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            box-shadow: var(--shadow);
+            max-width: 900px;
             width: 100%;
+        }
+
+        /* Шапка с переключателем темы */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .title-section h1 {
+            font-size: 2.8em;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .title-section .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .theme-switch {
+            background: var(--playlist-bg);
+            border-radius: 60px;
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+            border: 2px solid var(--track-border);
+        }
+
+        .theme-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            background: transparent;
+            color: var(--text-secondary);
             transition: 0.3s;
         }
 
-        h1 {
-            font-size: 2.5em;
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .theme-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 5px 15px var(--active-glow);
         }
 
-        .subtitle {
-            text-align: center;
-            color: #666;
+        /* Плейлисты */
+        .playlists {
+            display: flex;
+            gap: 15px;
             margin-bottom: 30px;
-            font-size: 1.1em;
+            flex-wrap: wrap;
         }
 
+        .playlist-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            background: var(--playlist-bg);
+            color: var(--text-primary);
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid var(--track-border);
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .playlist-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .playlist-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .playlist-emoji {
+            font-size: 1.3em;
+        }
+
+        /* Список треков */
         .track-list {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-bottom: 30px;
+            margin: 30px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .track-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .track-list::-webkit-scrollbar-track {
+            background: var(--playlist-bg);
+            border-radius: 10px;
+        }
+
+        .track-list::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
         }
 
         .track-item {
-            background: #f8f9fa;
-            border-radius: 20px;
+            background: var(--track-bg);
+            border-radius: 30px;
             padding: 20px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
+            border: 2px solid var(--track-border);
             transition: 0.3s;
-            border: 2px solid transparent;
         }
 
         .track-item:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            border-color: var(--accent);
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px var(--active-glow);
         }
 
-        .track-number {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 50%;
+        .track-cover {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 1.2em;
+            font-size: 2em;
+            color: white;
         }
 
         .track-info {
@@ -91,158 +212,240 @@
         }
 
         .track-name {
-            font-size: 1.2em;
+            font-size: 1.3em;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 5px;
         }
 
         .track-artist {
-            color: #666;
-            font-size: 0.9em;
+            color: var(--text-secondary);
+            font-size: 1em;
         }
 
         .play-btn {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border: none;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--accent);
             color: white;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2em;
+            font-size: 1.3em;
             transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px var(--active-glow);
         }
 
         .play-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.6);
+            transform: scale(1.15);
         }
 
         .play-btn.playing {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
+            background: var(--accent-hover);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 var(--active-glow); }
+            70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0);; }
+            100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0);; }
+        }
+
+        /* Аудиоплеер */
+        .player-section {
+            background: var(--playlist-bg);
+            border-radius: 40px;
+            padding: 25px;
+            margin: 20px 0;
         }
 
         .now-playing {
-            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .now-playing-cover {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+        }
+
+        .now-playing-info {
+            flex: 1;
         }
 
         .now-playing-label {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9em;
             margin-bottom: 5px;
         }
 
         .now-playing-title {
-            font-size: 1.2em;
+            font-size: 1.5em;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .now-playing-artist {
+            color: var(--text-secondary);
+            font-size: 1.1em;
         }
 
         audio {
             width: 100%;
-            margin-top: 20px;
-            border-radius: 30px;
+            margin-top: 15px;
+            border-radius: 50px;
         }
 
         audio::-webkit-media-controls-panel {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--accent);
             color: white;
         }
 
         .footer {
             text-align: center;
             margin-top: 30px;
-            color: #999;
-            font-size: 0.9em;
+            color: var(--text-secondary);
+            font-size: 1em;
+            padding-top: 20px;
+            border-top: 2px solid var(--track-border);
         }
     </style>
 </head>
 <body>
     <div class="player">
-        <h1>🎵 MusicVibe</h1>
-        <div class="subtitle">Твой личный плеер</div>
+        <div class="header">
+            <div class="title-section">
+                <h1>🗿 СТАСЯН</h1>
+                <div class="subtitle">Official music player by Стасян</div>
+            </div>
+            <div class="theme-switch">
+                <button class="theme-btn active" onclick="setTheme('light')">☀️ Светлая</button>
+                <button class="theme-btn" onclick="setTheme('dark')">🌙 Тёмная</button>
+            </div>
+        </div>
 
+        <!-- Плейлисты -->
+        <div class="playlists">
+            <button class="playlist-btn active" onclick="loadPlaylist('rock')">
+                <span class="playlist-emoji">🎸</span>
+                Рок-н-ролл
+            </button>
+            <button class="playlist-btn" onclick="loadPlaylist('anonym')">
+                <span class="playlist-emoji">👤</span>
+                Анонимный эмбер
+            </button>
+            <button class="playlist-btn" onclick="loadPlaylist('morgenshtern')">
+                <span class="playlist-emoji">💰</span>
+                Morgenshtern
+            </button>
+        </div>
+
+        <!-- Список треков -->
         <div class="track-list" id="trackList">
-            <!-- Треки будут добавляться сюда через JavaScript -->
+            <!-- Треки будут тут -->
         </div>
 
-        <div class="now-playing">
-            <div class="now-playing-label">Сейчас играет:</div>
-            <div class="now-playing-title" id="nowPlaying">—</div>
+        <!-- Плеер -->
+        <div class="player-section">
+            <div class="now-playing">
+                <div class="now-playing-cover" id="nowPlayingCover">🎵</div>
+                <div class="now-playing-info">
+                    <div class="now-playing-label">Сейчас играет</div>
+                    <div class="now-playing-title" id="nowPlayingTitle">Выбери трек</div>
+                    <div class="now-playing-artist" id="nowPlayingArtist">Стасян Music</div>
+                </div>
+            </div>
+            <audio id="audioPlayer" controls>
+                <source src="" type="audio/mpeg">
+            </audio>
         </div>
-
-        <audio id="audioPlayer" controls>
-            <source src="" type="audio/mpeg">
-            Твой браузер не поддерживает аудио
-        </audio>
 
         <div class="footer">
-            Сделано с ❤️ для музыки
+            🎧 Сделано Стасяном с любовью | Загружай свои треки
         </div>
     </div>
 
     <script>
-        // Наши треки (заменишь ссылки на свои)
-        const tracks = [
-            {
-                id: 1,
-                name: "Summer Vibes",
-                artist: "Artist 1",
-                url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-            },
-            {
-                id: 2,
-                name: "Night Drive",
-                artist: "Artist 2",
-                url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-            },
-            {
-                id: 3,
-                name: "Morning Light",
-                artist: "Artist 3",
-                url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-            }
-        ];
+        // ТВОИ ТРЕКИ - СЮДА ЗАЛИВАТЬ!!!
+        const playlists = {
+            rock: [
+                { name: "Rock You", artist: "Стасян", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", emoji: "🎸" },
+                { name: "Rock Star", artist: "Стасян feat. Рок", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", emoji: "🤘" },
+                { name: "Hard Rock", artist: "Стасян", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", emoji: "⚡" }
+            ],
+            anonym: [
+                { name: "Анонимность", artist: "Эмбер", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", emoji: "👤" },
+                { name: "В тени", artist: "Эмбер", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", emoji: "🌑" },
+                { name: "Неизвестный", artist: "Эмбер", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", emoji: "🎭" }
+            ],
+            morgenshtern: [
+                { name: "Cadillac", artist: "Morgenshtern", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", emoji: "💰" },
+                { name: "Ice", artist: "Morgenshtern", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", emoji: "❄️" },
+                { name: "Последняя", artist: "Morgenshtern", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", emoji: "🔥" }
+            ]
+        };
 
+        let currentPlaylist = 'rock';
         let currentTrack = null;
         const audioPlayer = document.getElementById('audioPlayer');
         const trackList = document.getElementById('trackList');
-        const nowPlaying = document.getElementById('nowPlaying');
+        const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+        const nowPlayingArtist = document.getElementById('nowPlayingArtist');
+        const nowPlayingCover = document.getElementById('nowPlayingCover');
 
-        // Создаем список треков
-        function renderTracks() {
+        // Загрузка плейлиста
+        window.loadPlaylist = function(playlistName) {
+            currentPlaylist = playlistName;
+            
+            // Подсветка кнопки
+            document.querySelectorAll('.playlist-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderTracks(playlists[playlistName]);
+        };
+
+        // Отрисовка треков
+        function renderTracks(tracks) {
             trackList.innerHTML = '';
             tracks.forEach((track, index) => {
                 const trackElement = document.createElement('div');
                 trackElement.className = 'track-item';
                 trackElement.innerHTML = `
-                    <div class="track-number">${index + 1}</div>
+                    <div class="track-cover">${track.emoji || '🎵'}</div>
                     <div class="track-info">
                         <div class="track-name">${track.name}</div>
                         <div class="track-artist">${track.artist}</div>
                     </div>
-                    <button class="play-btn" onclick="playTrack(${index})">▶</button>
+                    <button class="play-btn" onclick="playTrack('${currentPlaylist}', ${index})">▶</button>
                 `;
                 trackList.appendChild(trackElement);
             });
         }
 
-        // Функция для проигрывания трека
-        window.playTrack = function(index) {
-            const track = tracks[index];
+        // Проигрывание трека
+        window.playTrack = function(playlistName, index) {
+            const track = playlists[playlistName][index];
             audioPlayer.src = track.url;
             audioPlayer.play();
-            currentTrack = index;
-            nowPlaying.textContent = `${track.name} - ${track.artist}`;
+            
+            nowPlayingTitle.textContent = track.name;
+            nowPlayingArtist.textContent = track.artist;
+            nowPlayingCover.textContent = track.emoji || '🎵';
             
             // Обновляем кнопки
             document.querySelectorAll('.play-btn').forEach((btn, i) => {
@@ -262,11 +465,21 @@
                 btn.innerHTML = '▶';
                 btn.classList.remove('playing');
             });
-            nowPlaying.textContent = '—';
         });
 
-        // Загружаем треки при открытии страницы
-        renderTracks();
+        // Переключение темы
+        window.setTheme = function(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Подсветка кнопок темы
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        };
+
+        // Загружаем первый плейлист
+        renderTracks(playlists.rock);
     </script>
 </body>
 </html>
