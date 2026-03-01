@@ -1,10 +1,272 @@
-!DOCTYPE html
-html
-head
-    titleМой первый сайт на GitHubtitle
-head
-body
-    h1Привет, мир!h1
-    pЭто мой новый сайт, работающий на GitHub Pages.p
-body
-html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicVibe | Твоя музыка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .player {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: 0 50px 70px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .track-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .track-item {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .track-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .track-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .track-info {
+            flex: 1;
+        }
+
+        .track-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .track-artist {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .play-btn.playing {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .now-playing {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .now-playing-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .now-playing-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 30px;
+        }
+
+        audio::-webkit-media-controls-panel {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="player">
+        <h1>🎵 MusicVibe</h1>
+        <div class="subtitle">Твой личный плеер</div>
+
+        <div class="track-list" id="trackList">
+            <!-- Треки будут добавляться сюда через JavaScript -->
+        </div>
+
+        <div class="now-playing">
+            <div class="now-playing-label">Сейчас играет:</div>
+            <div class="now-playing-title" id="nowPlaying">—</div>
+        </div>
+
+        <audio id="audioPlayer" controls>
+            <source src="" type="audio/mpeg">
+            Твой браузер не поддерживает аудио
+        </audio>
+
+        <div class="footer">
+            Сделано с ❤️ для музыки
+        </div>
+    </div>
+
+    <script>
+        // Наши треки (заменишь ссылки на свои)
+        const tracks = [
+            {
+                id: 1,
+                name: "Summer Vibes",
+                artist: "Artist 1",
+                url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+            },
+            {
+                id: 2,
+                name: "Night Drive",
+                artist: "Artist 2",
+                url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+            },
+            {
+                id: 3,
+                name: "Morning Light",
+                artist: "Artist 3",
+                url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+            }
+        ];
+
+        let currentTrack = null;
+        const audioPlayer = document.getElementById('audioPlayer');
+        const trackList = document.getElementById('trackList');
+        const nowPlaying = document.getElementById('nowPlaying');
+
+        // Создаем список треков
+        function renderTracks() {
+            trackList.innerHTML = '';
+            tracks.forEach((track, index) => {
+                const trackElement = document.createElement('div');
+                trackElement.className = 'track-item';
+                trackElement.innerHTML = `
+                    <div class="track-number">${index + 1}</div>
+                    <div class="track-info">
+                        <div class="track-name">${track.name}</div>
+                        <div class="track-artist">${track.artist}</div>
+                    </div>
+                    <button class="play-btn" onclick="playTrack(${index})">▶</button>
+                `;
+                trackList.appendChild(trackElement);
+            });
+        }
+
+        // Функция для проигрывания трека
+        window.playTrack = function(index) {
+            const track = tracks[index];
+            audioPlayer.src = track.url;
+            audioPlayer.play();
+            currentTrack = index;
+            nowPlaying.textContent = `${track.name} - ${track.artist}`;
+            
+            // Обновляем кнопки
+            document.querySelectorAll('.play-btn').forEach((btn, i) => {
+                if (i === index) {
+                    btn.innerHTML = '⏸';
+                    btn.classList.add('playing');
+                } else {
+                    btn.innerHTML = '▶';
+                    btn.classList.remove('playing');
+                }
+            });
+        };
+
+        // Когда трек закончился
+        audioPlayer.addEventListener('ended', function() {
+            document.querySelectorAll('.play-btn').forEach(btn => {
+                btn.innerHTML = '▶';
+                btn.classList.remove('playing');
+            });
+            nowPlaying.textContent = '—';
+        });
+
+        // Загружаем треки при открытии страницы
+        renderTracks();
+    </script>
+</body>
+</html>
